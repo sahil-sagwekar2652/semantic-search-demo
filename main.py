@@ -6,13 +6,12 @@ from langchain.text_splitter import (
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import Chroma
 from dotenv import load_dotenv
-import streamlit as st
 from get_embds import LocalLlamaEmbeddings
 import sys
+import os
 
-# from langchain.storage import RedisStore
 
-
+# Load environment variables
 load_dotenv()
 
 loader = DirectoryLoader(
@@ -32,7 +31,7 @@ print("-" * 20 + "DOCUMENT LOAD AND SPLIT COMPLETE" + "-" * 20)
 # embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L12-v2")
 
 embeddings = LocalLlamaEmbeddings(
-    "http://100.105.38.57:3001/v1/embeddings",
+    os.environ.get("EMBEDDINGS_URL"),
     {"accept": "application/json", "Content-Type": "application/json"},
 )
 
@@ -44,7 +43,7 @@ print("-" * 20 + "EMBEDDINGS CREATED" + "-" * 20)
 # load from disk
 # db = Chroma(persist_directory="./chroma_db", embedding_function=embeddings)
 
-query = input("Enter your query: ")
+query = str(sys.argv[1])
 
 query_embedding = embeddings.embed_query(query)
 

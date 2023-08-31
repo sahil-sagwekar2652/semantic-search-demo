@@ -8,7 +8,7 @@
 HUGGINGFACEHUB_API_TOKEN=_______
 
 # URL for embeddings endpoint of the local model e.g. - http://100.105.38.57:3001/v1/embeddings
-URL=_______
+EMBEDDINGS_URL=_______
 ```
 - Create virtual environment and install requirements
 ```bash
