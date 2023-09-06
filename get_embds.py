@@ -10,6 +10,11 @@ class LocalLlamaEmbeddings(Embeddings):
         self.headers = headers
         super().__init__()
 
+    def api_query(self, url: str, headers: dict, json: dict):
+        response = requests.post(url=self.url, headers=self.headers, json=json)
+        response = response.json()
+        return response["data"][0]["embedding"]
+
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         async def fetch_data(session, url, payload):
             async with session.post(url, json=payload) as resp:
