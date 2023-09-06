@@ -10,13 +10,11 @@ class LocalLlamaEmbeddings(Embeddings):
         self.headers = headers
         super().__init__()
 
-    def api_query(self, url: str, headers: dict, json: dict):
-        response = requests.post(url=self.url, headers=self.headers, json=json)
-        response = response.json()
-        return response["data"][0]["embedding"]
-
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
-        # embeddings = []
+        async def fetch_data(session, url, payload):
+            async with session.post(url, json=payload) as resp:
+                data = await resp.json()
+                return data["data"][0]["embedding"]
 
         async def post_multiple():
             async with aiohttp.ClientSession() as session:
@@ -24,37 +22,15 @@ class LocalLlamaEmbeddings(Embeddings):
                 for text in texts:  # replace with your range
                     url = self.url  # replace with your API endpoint
                     payload = {"input": text}  # replace with your payload
-                    async with session.post(url, json=payload) as resp:
-                        data = await resp.json()
-                        tasks.append(data)
+                    tasks.append(fetch_data(session, url, payload))  # Append the coroutine
+
                 responses = await asyncio.gather(*tasks)
 
+            return responses
+
+        # Call the async function using asyncio.run()
         embeddings = asyncio.run(post_multiple())
-
-
-        # for text in texts:
-        #     data = {
-        #         "input": text,
-        #     }
-        #     embeddings.append(
-        #         self.api_query(url=self.url, headers=self.headers, json=data)
-        #     )
         return embeddings
 
     def embed_query(self, text: str) -> List[float]:
         return self.api_query(url=self.url, headers=self.headers, json={"input": text})
-
-
-
-
-async def post_multiple():
-    async with aiohttp.ClientSession() as session:
-        tasks = []
-        for number in range(1, 151):  # replace with your range
-            url = f'https://your-api-endpoint/{number}'  # replace with your API endpoint
-            payload = {"key": "value"}  # replace with your payload
-            async with session.post(url, json=payload) as resp:
-                data = await resp.json()
-                tasks.append(data)
-        responses = await asyncio.gather(*tasks)
-        # process responses here

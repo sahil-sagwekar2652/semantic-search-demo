@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from get_embds import LocalLlamaEmbeddings
 import sys
 import os
+import time
 
 
 # Load environment variables
@@ -28,15 +29,15 @@ docs = loader.load_and_split(
 
 print("-" * 20 + "DOCUMENT LOAD AND SPLIT COMPLETE" + "-" * 20)
 
-# embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L12-v2")
-
 embeddings = LocalLlamaEmbeddings(
     os.environ.get("EMBEDDINGS_URL"),
     {"accept": "application/json", "Content-Type": "application/json"},
 )
 
 # save to disk
-db = Chroma.from_documents(docs, embeddings, persist_directory="./chroma_db")
+start = time.time()
+db = Chroma.from_documents([docs[0]], embeddings, persist_directory="./chroma_db")
+print(f"\nEmbeddings created in {time.time()-start}\n")
 
 print("-" * 20 + "EMBEDDINGS CREATED" + "-" * 20)
 
@@ -45,13 +46,15 @@ print("-" * 20 + "EMBEDDINGS CREATED" + "-" * 20)
 
 query = str(sys.argv[1])
 
-query_embedding = embeddings.embed_query(query)
+# query_embedding = embeddings.embed_query(query)
+# fdocs = db.similarity_search_by_vector(query_embedding)
 
-fdocs = db.similarity_search_by_vector(query_embedding)
-
+fdocs = db.search(query=query, search_type='similarity')
 
 for i in fdocs:
     print(i.metadata)
     print("\n\n")
     print(i.page_content)
     print("\n\n")
+
+print("-" * 20 + "SEARCH COMPLETE" + "-" * 20)
