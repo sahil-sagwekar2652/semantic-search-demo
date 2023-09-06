@@ -6,7 +6,6 @@ from langchain.text_splitter import (
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import Chroma
 from dotenv import load_dotenv
-from get_embds import LocalLlamaEmbeddings
 import sys
 import os
 
@@ -26,14 +25,13 @@ docs = loader.load_and_split(
     text_splitter=RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=10)
 )
 
+with open("docs.txt", "w") as file:
+    for doc in docs:
+        file.write(doc.page_content)
+
 print("-" * 20 + "DOCUMENT LOAD AND SPLIT COMPLETE" + "-" * 20)
 
-# embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L12-v2")
-
-embeddings = LocalLlamaEmbeddings(
-    os.environ.get("EMBEDDINGS_URL"),
-    {"accept": "application/json", "Content-Type": "application/json"},
-)
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L12-v2")
 
 # save to disk
 db = Chroma.from_documents(docs, embeddings, persist_directory="./chroma_db")
