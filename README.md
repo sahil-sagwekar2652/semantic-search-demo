@@ -12,8 +12,23 @@ EMBEDDINGS_URL=_______
 ```
 - Create virtual environment and install requirements
 ```bash
-$ python -m venv venv
-$ source /venv/bin/activate
-$ pip install -r requirements.txt
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
+
+- Alternatively, create conda environment and install requirements
+
+```
+conda deactivate
+conda env remove -n sahil
+conda create --name sahil python=3.10 -y
+conda activate sahil
+pip install -r requirements.txt
+```
+
+
 - Execute the `main.py` file
+```
+python main.py
+```

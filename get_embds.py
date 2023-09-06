@@ -1,7 +1,8 @@
 from langchain.embeddings.base import Embeddings
 from typing import List
 import requests
-
+import asyncio
+import aiohttp
 
 class LocalLlamaEmbeddings(Embeddings):
     def __init__(self, url: str, headers: dict):
@@ -17,18 +18,18 @@ class LocalLlamaEmbeddings(Embeddings):
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         # embeddings = []
 
-	    async def post_multiple():
-		    async with aiohttp.ClientSession() as session:
-		    	tasks = []
-		        for text in texts:  # replace with your range
-		            url = self.url  # replace with your API endpoint
-		            payload = {"input": text}  # replace with your payload
-		            async with session.post(url, json=payload) as resp:
-		                data = await resp.json()
-		                tasks.append(data)
-		        responses = await asyncio.gather(*tasks)
+        async def post_multiple():
+            async with aiohttp.ClientSession() as session:
+                tasks = []
+                for text in texts:  # replace with your range
+                    url = self.url  # replace with your API endpoint
+                    payload = {"input": text}  # replace with your payload
+                    async with session.post(url, json=payload) as resp:
+                        data = await resp.json()
+                        tasks.append(data)
+                responses = await asyncio.gather(*tasks)
 
-		embeddings = asyncio.run(post_multiple())
+        embeddings = asyncio.run(post_multiple())
 
 
         # for text in texts:
