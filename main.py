@@ -28,6 +28,7 @@ docs = loader.load_and_split(
 with open("docs.txt", "w") as file:
     for doc in docs:
         file.write(doc.page_content)
+        file.close()
 
 print("-" * 20 + "DOCUMENT LOAD AND SPLIT COMPLETE" + "-" * 20)
 
