@@ -162,3 +162,4 @@ cython_debug/
 consume/
 chroma_db/
 venv/
+consumex
